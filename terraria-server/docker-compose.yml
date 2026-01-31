@@ -1,0 +1,18 @@
+services:
+  terraria:
+    build: .
+    container_name: terraria_145
+    restart: unless-stopped
+    ports:
+      - "7777:7777"
+    volumes:
+      # Map the worlds folder so you don't lose progress on container rebuilds
+      - ./worlds:/terraria/Worlds
+      # Map the config so you can tweak settings without rebuilding
+      - ./serverconfig.txt:/terraria/serverconfig.txt
+    environment:
+      - BOX64_LOG=0 # Keep logs clean unless debugging
+    deploy:
+      resources:
+        limits:
+          memory: 4G

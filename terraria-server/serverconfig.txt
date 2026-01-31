@@ -1,0 +1,9 @@
+# Basic Server Config
+world=/terraria/Worlds/BananilWorld.wld
+autocreate=2
+worldname=Bananil
+difficulty=0
+maxplayers=12
+port=7777
+password=
+motd=Welcome to the Bananil Server
