@@ -7,7 +7,12 @@ container = "terraria" # Optional: for Docker fallback check
 
 [[servers]]
 name = "Hytale Server"
-host = "127.0.0.1"
+host = "host.docker.internal"
 port = 5520
 type = "Unknown"    # If unknown, it defaults to Raw UDP/TCP check
 protocol = "udp"    # Hint for the fallback checker
+
+# DOCKER NOTE:
+# To check servers running on the host machine from inside Docker:
+# Replace "127.0.0.1" with "host.docker.internal".
+

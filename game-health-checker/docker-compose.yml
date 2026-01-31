@@ -1,0 +1,13 @@
+services:
+  sentinel:
+    build: .
+    container_name: game-health-checker
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount the configuration file
+      - ./servers.toml:/app/servers.toml
+    extra_hosts:
+      # Allows reaching the host machine via 'host.docker.internal'
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
