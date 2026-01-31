@@ -1,0 +1,13 @@
+[[servers]]
+name = "My Terraria World"
+host = "127.0.0.1"
+port = 7777
+type = "Terraria"   # Maps to gamedig protocol
+container = "terraria" # Optional: for Docker fallback check
+
+[[servers]]
+name = "Hytale Server"
+host = "127.0.0.1"
+port = 5520
+type = "Unknown"    # If unknown, it defaults to Raw UDP/TCP check
+protocol = "udp"    # Hint for the fallback checker
