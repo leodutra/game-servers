@@ -6,7 +6,7 @@ use axum::{
 };
 use shared::ServerStatus;
 use gamedig::games::minecraft;
-use std::{sync::Arc, time::Duration, fs, net::TcpStream, str::FromStr};
+use std::{sync::Arc, time::Duration, fs, net::TcpStream, str::FromStr, net::ToSocketAddrs};
 use tokio::sync::broadcast;
 use futures::stream::Stream;
 use tower_http::services::ServeDir;
@@ -30,7 +30,7 @@ struct ServerConfigItem {
     #[serde(rename = "type")]
     server_type: String,
     #[serde(default)]
-    _protocol: Option<String>,
+    protocol: Option<String>,
 }
 
 #[tokio::main]
@@ -91,54 +91,80 @@ async fn main() {
 async fn check_server(config: ServerConfigItem, tx: broadcast::Sender<ServerStatus>) {
     let now = chrono::Local::now().format("%H:%M:%S").to_string();
 
+    // Resolve Hostname to IP (Blocking DNS)
+    let addr_str = format!("{}:{}", config.host, config.port);
+    let socket_addr = addr_str.to_socket_addrs().ok().and_then(|mut iter| iter.next());
+
     let status = match config.server_type.as_str() {
         "Terraria" => {
-            // Simple TCP Check for Terraria (TShock support removed from Gamedig)
-            // Parse host IP
-            let addr_str = format!("{}:{}", config.host, config.port);
-            match std::net::SocketAddr::from_str(&addr_str) {
-                Ok(addr) => {
-                     match TcpStream::connect_timeout(&addr, Duration::from_secs(2)) {
-                        Ok(_) => ServerStatus {
-                            name: config.name.clone(),
-                            server_type: "Terraria".to_string(),
-                            online: true,
-                            players: "?/?".to_string(),
-                            ping: 0,
-                            details: "Online (TCP)".to_string(),
-                            last_updated: now,
-                        },
-                        Err(e) => offline_status(config.name, "Terraria", e.to_string(), now),
-                    }
-                },
-                 Err(_) => offline_status(config.name, "Terraria", "Invalid IP".to_string(), now),
+            if let Some(addr) = socket_addr {
+                 match TcpStream::connect_timeout(&addr, Duration::from_secs(2)) {
+                    Ok(_) => ServerStatus {
+                        name: config.name.clone(),
+                        server_type: "Terraria".to_string(),
+                        online: true,
+                        players: "?/?".to_string(),
+                        ping: 0,
+                        details: "Online (TCP)".to_string(),
+                        last_updated: now,
+                    },
+                    Err(e) => offline_status(config.name, "Terraria", e.to_string(), now),
+                }
+            } else {
+                 offline_status(config.name, "Terraria", "DNS Resolution Failed".to_string(), now)
             }
         },
         "Minecraft" => {
-             match minecraft::query(&config.host.parse().unwrap(), Some(config.port)) {
-                Ok(response) => ServerStatus {
-                    name: config.name.clone(),
-                    server_type: "Minecraft".to_string(),
-                    online: true,
-                    players: format!("{}/{}", response.players_online, response.players_maximum),
-                    ping: 0,
-                    details: "Online".to_string(),
-                    last_updated: now,
-                },
-                 Err(e) => offline_status(config.name, "Minecraft", e.to_string(), now),
+             if let Some(addr) = socket_addr {
+                 match minecraft::query(&addr.ip(), Some(config.port)) {
+                    Ok(response) => ServerStatus {
+                        name: config.name.clone(),
+                        server_type: "Minecraft".to_string(),
+                        online: true,
+                        players: format!("{}/{}", response.players_online, response.players_maximum),
+                        ping: 0,
+                        details: "Online".to_string(),
+                        last_updated: now,
+                    },
+                     Err(e) => offline_status(config.name, "Minecraft", e.to_string(), now),
+                 }
+             } else {
+                 offline_status(config.name, "Minecraft", "DNS Resolution Failed".to_string(), now)
              }
         },
         _ => {
             // Generic fallback or unknown
-             ServerStatus {
-                name: config.name.clone(),
-                server_type: config.server_type.clone(),
-                online: false, // Implement generic TCP/UDP ping if needed
-                players: "-/-".to_string(),
-                ping: 0,
-                details: "Unsupported type".to_string(),
-                last_updated: now,
-            }
+             let proto = config.protocol.as_deref().unwrap_or("tcp").to_lowercase();
+             if let Some(addr) = socket_addr {
+                 if proto == "udp" {
+                     // Generic UDP "check" - Assume online if DNS resolves as we can't easily ping
+                      ServerStatus {
+                        name: config.name.clone(),
+                        server_type: config.server_type.clone(),
+                        online: true,
+                        players: "-/-".to_string(),
+                        ping: 0,
+                        details: "Online (UDP - Unverified)".to_string(),
+                        last_updated: now,
+                    }
+                 } else {
+                     // Assume TCP
+                     match TcpStream::connect_timeout(&addr, Duration::from_secs(2)) {
+                        Ok(_) => ServerStatus {
+                            name: config.name.clone(),
+                            server_type: config.server_type.clone(),
+                            online: true,
+                            players: "-/-".to_string(),
+                            ping: 0,
+                            details: "Online (TCP)".to_string(),
+                            last_updated: now,
+                        },
+                        Err(e) => offline_status(config.name, &config.server_type, e.to_string(), now),
+                    }
+                 }
+             } else {
+                  offline_status(config.name, &config.server_type, "DNS Resolution Failed".to_string(), now)
+             }
         }
     };
 
