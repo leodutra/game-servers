@@ -161,10 +161,11 @@ async fn sse_handler(State(state): State<Arc<AppState>>) -> Sse<impl Stream<Item
     let mut rx = state.tx.subscribe();
     let stream = async_stream::stream! {
         loop {
-            if let Ok(status) = rx.recv().await
-                && let Ok(json) = serde_json::to_string(&status) {
+            if let Ok(status) = rx.recv().await {
+                if let Ok(json) = serde_json::to_string(&status) {
                     yield Ok(Event::default().data(json));
                 }
+            }
         }
     };
     Sse::new(stream).keep_alive(axum::response::sse::KeepAlive::default())
