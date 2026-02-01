@@ -191,9 +191,13 @@ async fn udp_probe(addr: SocketAddr, timeout: Duration) -> Result<(), String> {
     socket.connect(addr).await.map_err(|e| e.to_string())?;
 
     // Send a single-byte probe. Some servers respond with a banner/ping reply.
-    socket.send(&[0]).await.map_err(|e| e.to_string())?;
+    // NOTE: Many game servers (Hytale, Minecraft Bedrock, etc) ignore empty or garbled UDP packets.
+    // Sending a specific payload might be required for Hytale, but a generic "ping" (0xFE or similar) usually works better
+    // than a zero byte for games.
+    // For now, let's try sending a common query byte (0xFE) which is used in some protocols as a ping.
+    socket.send(&[0xFE]).await.map_err(|e| e.to_string())?;
 
-    let mut buf = [0u8; 1];
+    let mut buf = [0u8; 1024]; // Increase buffer size to capture banner
     match tokio::time::timeout(timeout, socket.recv(&mut buf)).await {
         Ok(Ok(_)) => Ok(()),
         Ok(Err(e)) => Err(e.to_string()),
@@ -205,12 +209,22 @@ async fn sse_handler(State(state): State<Arc<AppState>>) -> Sse<impl Stream<Item
     let mut rx = state.tx.subscribe();
     let stream = async_stream::stream! {
         loop {
-            if let Ok(status) = rx.recv().await {
-                if let Ok(json) = serde_json::to_string(&status) {
-                    yield Ok(Event::default().data(json));
-                }
+            match rx.recv().await {
+                Ok(status) => {
+                    if let Ok(json) = serde_json::to_string(&status) {
+                        yield Ok(Event::default().data(json));
+                    }
+                },
+                Err(broadcast::error::RecvError::Lagged(missed)) => {
+                    // Log or handle lag if critical, but we continue to get next updates
+                    eprintln!("Client lagged, missed {} messages", missed);
+                    continue;
+                },
+                Err(broadcast::error::RecvError::Closed) => {
+                    break;
+                },
             }
         }
     };
-    Sse::new(stream).keep_alive(axum::response::sse::KeepAlive::default())
+    Sse::new(stream).keep_alive(axum::response::sse::KeepAlive::new().text("keep-alive"))
 }
