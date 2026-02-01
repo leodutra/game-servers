@@ -6,8 +6,8 @@ use axum::{
 };
 use shared::ServerStatus;
 use gamedig::games::minecraft;
-use std::{sync::Arc, time::Duration, fs, net::TcpStream, str::FromStr, net::ToSocketAddrs};
-use tokio::sync::broadcast;
+use std::{sync::Arc, time::Duration, fs, net::{TcpStream, ToSocketAddrs, SocketAddr}};
+use tokio::{sync::broadcast, net::UdpSocket};
 use futures::stream::Stream;
 use tower_http::services::ServeDir;
 use serde::Deserialize;
@@ -137,15 +137,17 @@ async fn check_server(config: ServerConfigItem, tx: broadcast::Sender<ServerStat
              let proto = config.protocol.as_deref().unwrap_or("tcp").to_lowercase();
              if let Some(addr) = socket_addr {
                  if proto == "udp" {
-                     // Generic UDP check is unreliable without a specific protocol
-                      ServerStatus {
-                        name: config.name.clone(),
-                        server_type: config.server_type.clone(),
-                        online: false,
-                        players: "-/-".to_string(),
-                        ping: 0,
-                        details: "UDP Unsupported (Unknown Type)".to_string(),
-                        last_updated: now,
+                     match udp_probe(addr, Duration::from_secs(2)).await {
+                        Ok(()) => ServerStatus {
+                            name: config.name.clone(),
+                            server_type: config.server_type.clone(),
+                            online: true,
+                            players: "-/-".to_string(),
+                            ping: 0,
+                            details: "Online (UDP)".to_string(),
+                            last_updated: now,
+                        },
+                        Err(e) => offline_status(config.name, &config.server_type, e, now),
                     }
                  } else {
                      // Assume TCP
@@ -180,6 +182,22 @@ fn offline_status(name: String, s_type: &str, error: String, time: String) -> Se
         ping: 0,
         details: format!("Offline: {}", error),
         last_updated: time,
+    }
+}
+
+async fn udp_probe(addr: SocketAddr, timeout: Duration) -> Result<(), String> {
+    let bind_addr = if addr.is_ipv6() { "[::]:0" } else { "0.0.0.0:0" };
+    let socket = UdpSocket::bind(bind_addr).await.map_err(|e| e.to_string())?;
+    socket.connect(addr).await.map_err(|e| e.to_string())?;
+
+    // Send a single-byte probe. Some servers respond with a banner/ping reply.
+    socket.send(&[0]).await.map_err(|e| e.to_string())?;
+
+    let mut buf = [0u8; 1];
+    match tokio::time::timeout(timeout, socket.recv(&mut buf)).await {
+        Ok(Ok(_)) => Ok(()),
+        Ok(Err(e)) => Err(e.to_string()),
+        Err(_) => Err("No UDP response".to_string()),
     }
 }
 
