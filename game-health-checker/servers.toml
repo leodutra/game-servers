@@ -1,6 +1,6 @@
 [[servers]]
 name = "My Terraria World"
-host = "terraria"
+host = "host.docker.internal"
 port = 7777
 type = "Terraria"   # Maps to gamedig protocol
 container = "terraria" # Optional: for Docker fallback check

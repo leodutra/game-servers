@@ -137,14 +137,14 @@ async fn check_server(config: ServerConfigItem, tx: broadcast::Sender<ServerStat
              let proto = config.protocol.as_deref().unwrap_or("tcp").to_lowercase();
              if let Some(addr) = socket_addr {
                  if proto == "udp" {
-                     // Generic UDP "check" - Assume online if DNS resolves as we can't easily ping
+                     // Generic UDP check is unreliable without a specific protocol
                       ServerStatus {
                         name: config.name.clone(),
                         server_type: config.server_type.clone(),
-                        online: true,
+                        online: false,
                         players: "-/-".to_string(),
                         ping: 0,
-                        details: "Online (UDP - Unverified)".to_string(),
+                        details: "UDP Unsupported (Unknown Type)".to_string(),
                         last_updated: now,
                     }
                  } else {
