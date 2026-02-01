@@ -3,6 +3,8 @@ services:
     build: .
     container_name: terraria_145
     restart: unless-stopped
+    stdin_open: true
+    tty: true
     ports:
       - "7777:7777"
     volumes:
