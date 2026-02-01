@@ -49,8 +49,8 @@ fn App() -> impl IntoView {
         let event_source = web_sys::EventSource::new("/api/events").unwrap();
 
         let on_message = EventListener::new(&event_source, "message", move |event| {
-            if let Ok(msg_event) = event.clone().dyn_into::<web_sys::MessageEvent>()
-                && let Some(text) = msg_event.data().as_string() {
+            if let Ok(msg_event) = event.clone().dyn_into::<web_sys::MessageEvent>() {
+                if let Some(text) = msg_event.data().as_string() {
                      match serde_json::from_str::<ServerStatus>(&text) {
                         Ok(new_status) => {
                             set_servers.update(|map| {
@@ -60,6 +60,7 @@ fn App() -> impl IntoView {
                         Err(e) => logging::log!("Failed to parse JSON: {:?}", e),
                     }
                 }
+            }
         });
 
         on_cleanup(move || drop(on_message));
