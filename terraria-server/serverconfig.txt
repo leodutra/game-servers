@@ -2,7 +2,7 @@
 world=/terraria/Worlds/BananilWorld.wld
 autocreate=2
 worldname=Bananil
-difficulty=0
+difficulty=1
 maxplayers=12
 port=7777
 password=
