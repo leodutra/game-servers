@@ -1,7 +1,7 @@
 services:
   terraria:
     build: .
-    container_name: terraria_145
+    container_name: terraria_v1_4_5
     restart: unless-stopped
     stdin_open: true
     tty: true
