@@ -1,0 +1,20 @@
+services:
+  status-app:
+    build:
+      context: ..
+      dockerfile: status-app/Dockerfile
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    environment:
+      - TERRARIA_HOST=play.bananil.net
+      - TERRARIA_PORT=7777
+      - HYTALE_HOST=play.bananil.net
+      - HYTALE_PORT=5520
+      - HISTORY_FILE_PATH=/data/status-history.csv
+    volumes:
+      - status_data:/data
+
+volumes:
+  status_data:
+

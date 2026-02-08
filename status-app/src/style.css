@@ -1,0 +1,118 @@
+:root {
+    /* Banana Theme Colors */
+    --color-banana-bg: #F5E6D3;
+    --color-banana-card: #FCF5E2;
+    --color-banana-graph: #F3E5D3;
+    --color-banana-input: #46556440;
+
+    --color-brown: #583017;
+    --color-brown-dark: #3E2723;
+    --color-brown-light: #8D6E63;
+
+    --color-yellow: #FFD633;
+    --color-yellow-light: #FFF5CC;
+    --color-yellow-btn-from: #FFEB3B;
+    --color-yellow-btn-to: #FBC02D;
+    --color-yellow-btn-hover-from: #FFEB80;
+    --color-yellow-btn-hover-to: #FFD633;
+
+    --color-green: #5DBE5D;
+    --color-green-dark: #1B5E20;
+    --color-green-border: #388E3C;
+    --color-green-to: #4CAF50;
+
+    --color-red: #EF5350;
+    --color-red-dark: #7F0000;
+    --color-red-border: #B71C1C;
+    --color-red-to: #D32F2F;
+
+    --color-hytale: #5A6A7A;
+
+    /* Shadows */
+    --shadow-brown-xs: 0 1px 0 #583017;
+    --shadow-brown-sm: 0 2px 0 #583017;
+    --shadow-brown-md: 0 2.5px 0 #583017;
+    --shadow-brown-lg: 0 3px 0 #583017;
+    --shadow-brown-xl: 0 4px 0 #583017;
+    --shadow-green-xl: 0 6px 0 #1B5E20;
+
+    --shadow-card: 0 6px 16px rgba(0,0,0,0.25);
+    --shadow-btn: 0 4px 8px rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.5), inset 0 -4px 0 rgba(0,0,0,0.15);
+    --shadow-bevel: inset 6px 6px 10px rgba(88,48,23,0.2), inset -6px -6px 10px rgba(255,255,255,0.7);
+
+    /* Text Strokes (Approximate since standard CSS text-stroke is non-standard but widely supported) */
+    --stroke-main: 8px #583017;
+    --stroke-main-outer: 16px rgba(255,255,255,0.9);
+    --stroke-server: 4.5px #583017;
+    --stroke-stat: 5px #583017;
+    --stroke-sm: 3px #583017;
+    --stroke-md: 4px #583017;
+    --stroke-green-sm: 3px #1B5E20;
+    --stroke-red-sm: 3px #7F0000;
+    --stroke-uptime: 10px #1B5E20;
+
+    --font-fredoka: 'Fredoka', sans-serif;
+}
+
+body {
+    position: relative;
+    min-height: 100vh;
+    margin: 0;
+    font-family: var(--font-fredoka);
+    background-color: var(--color-banana-bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4rem 1rem;
+    position: relative;
+    color: var(--color-brown);
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('images/bg-tile-3.jpg');
+    background-repeat: repeat;
+    background-size: 800px;
+    opacity: 0.8;
+    z-index: -10;
+    pointer-events: none;
+}
+
+/* Utilities equivalent to tailwind custom ones */
+.text-stroke-main {
+    -webkit-text-stroke: var(--stroke-main);
+}
+.paint-stroke {
+    paint-order: stroke fill;
+}
+
+.font-fredoka {
+    font-family: var(--font-fredoka);
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* Reset margins and paddings for common elements to mimic Tailwind Preflight */
+h1, h2, h3, h4, h5, h6, p {
+    margin: 0;
+}
+
+button {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}

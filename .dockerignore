@@ -1,0 +1,11 @@
+# Ignore build artifacts globally to prevent GLIBC/Architecture mismatches
+**/target/
+**/dist/
+**/node_modules/
+**/.git/
+**/.DS_Store
+**/.vscode/
+
+# Specific files
+status-app/style.css
+status-app/reference.jpeg

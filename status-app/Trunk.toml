@@ -1,0 +1,18 @@
+[build]
+target = "index.html"
+
+[serve]
+address = "0.0.0.0"
+port = 8080
+
+[[proxy]]
+rewrite = "/api"
+backend = "http://localhost:3000/api"
+
+[[hooks]]
+stage = "pre_build"
+command = "npx"
+command_arguments = ["tailwindcss", "-i", "input.css", "-o", "style.css"]
+
+[watch]
+ignore = ["style.css"]

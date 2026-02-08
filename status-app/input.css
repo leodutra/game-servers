@@ -1,0 +1,18 @@
+@import "tailwindcss";
+@config "./tailwind.config.js";
+
+@layer base {
+    body {
+        font-family: theme('fontFamily.fredoka');
+    }
+}
+
+@layer utilities {
+    @keyframes bananil-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .animate-bananil-spin {
+        animation: bananil-spin 1.5s linear infinite;
+    }
+}

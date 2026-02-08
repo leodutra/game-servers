@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
     && wget https://ryanfortner.github.io/box64-debs/box64.list -O /etc/apt/sources.list.d/box64.list \
     && wget -qO- https://ryanfortner.github.io/box64-debs/KEY.gpg | gpg --dearmor -o /etc/apt/trusted.gpg.d/box64.gpg \
     && apt-get update \
-    && apt-get install -y box64-rpi5arm64 \
+    && apt-get install -y box64-rpi5arm64 libfaudio0 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /terraria
