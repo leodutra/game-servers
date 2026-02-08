@@ -2,7 +2,7 @@
 
 This repository contains the infrastructure code, monitoring tools, and web dashboard for the `bananil.net` game server network. The system runs on a Raspberry Pi 5, utilizing a hybrid network setup for secure web access and low-latency gaming.
 
-![](screenshot.png)
+![Server Page Screenshot](screenshot.jpg)
 
 ## Project Structure
 
