@@ -1,6 +1,6 @@
 FROM debian:bookworm-slim
 
-ARG TERRARIA_VERSION=1450
+ARG TERRARIA_VERSION=1454
 ARG DOWNLOAD_URL=https://terraria.org/api/download/pc-dedicated-server/terraria-server-${TERRARIA_VERSION}.zip
 
 ENV DEBIAN_FRONTEND=noninteractive
