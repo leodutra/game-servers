@@ -6,6 +6,13 @@ ARG DOWNLOAD_URL=https://terraria.org/api/download/pc-dedicated-server/terraria-
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Box64 Environment Variables for RPi 5 (16k page size)
+ENV BOX64_PAGE_SIZE=16384
+ENV BOX64_DYNAREC_STRONGMEM=1
+ENV BOX64_DYNAREC_BIGBLOCK=0
+ENV BOX64_DYNAREC_FASTROUND=1
+
+
 # 1. Install prerequisites and setup the Box64 Repo (ARM64 only)
 # We use the 'ryanfortner' repo which provides specific builds for Pi 5
 RUN apt-get update && apt-get install -y \
