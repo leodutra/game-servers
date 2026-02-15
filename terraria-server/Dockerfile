@@ -17,8 +17,9 @@ RUN apt-get update && apt-get install -y \
     && if [ "$TARGETARCH" = "arm64" ]; then \
     wget https://ryanfortner.github.io/box64-debs/box64.list -O /etc/apt/sources.list.d/box64.list \
     && wget -qO- https://ryanfortner.github.io/box64-debs/KEY.gpg | gpg --dearmor -o /etc/apt/trusted.gpg.d/box64.gpg \
+    && dpkg --add-architecture amd64 \
     && apt-get update \
-    && apt-get install -y box64-rpi5arm64ps16k; \
+    && apt-get install -y box64-rpi5arm64ps16k libc6:amd64 libgcc-s1:amd64 libstdc++6:amd64; \
     fi \
     && rm -rf /var/lib/apt/lists/*
 
