@@ -14,10 +14,6 @@ services:
       - ./serverconfig.txt:/terraria/serverconfig.txt
     environment:
       - BOX64_LOG=1 # Enable logs for debugging
-      - BOX64_PAGE_SIZE=16384
-      - BOX64_DYNAREC_STRONGMEM=1
-      - BOX64_DYNAREC_BIGBLOCK=0
-      - BOX64_DYNAREC_FASTROUND=1
     deploy:
       resources:
         limits:
