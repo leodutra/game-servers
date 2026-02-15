@@ -9,11 +9,11 @@ services:
       - "7777:7777"
     volumes:
       # Map the worlds folder so you don't lose progress on container rebuilds
-      - ./worlds:/terraria/Worlds
+      - ./worlds:/terraria/worlds
       # Map the config so you can tweak settings without rebuilding
       - ./serverconfig.txt:/terraria/serverconfig.txt
-    environment:
-      - BOX64_LOG=1 # Enable logs for debugging
+    # Override default command to force world path
+    command: ["-config", "serverconfig.txt", "-worldpath", "/terraria/worlds"]
     deploy:
       resources:
         limits:

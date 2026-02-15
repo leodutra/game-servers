@@ -1,5 +1,5 @@
 # Basic Server Config
-world=/terraria/Worlds/BananilWorld.wld
+world=/terraria/worlds/BananilWorld.wld
 autocreate=2
 worldname=Bananil
 difficulty=1
