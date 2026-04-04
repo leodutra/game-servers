@@ -6,4 +6,5 @@ difficulty=1
 maxplayers=12
 port=7777
 password=
-motd=Bem-vindo ao [c/FFFF00:Bananil]: Onde até o Eye of Cthulhu tem medo de ser assaltado.
+motd=Bem-vindo ao [c/FFFF00:Bananil].
+
